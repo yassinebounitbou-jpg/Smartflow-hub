@@ -281,19 +281,24 @@
 
             const targetLanguage = currentLang === 'fr' ? 'French (Français)' : 'English';
 
-            const systemContext = `You are a high-level strategic advisor. 
-            Analyze the user input and build a structured response.
-            You must reply ONLY with a clean JSON object. No Markdown code fences or extra text.
-            The JSON structure must match this scheme perfectly:
-            {
-                "category": "idea" or "project" or "trip",
-                "title": "A short elegant title strictly written in ${targetLanguage}",
-                "roadmap": ["Step 1 formatted in ${targetLanguage}", "Step 2 formatted in ${targetLanguage}", "Step 3 formatted in ${targetLanguage}", "Step 4 formatted in ${targetLanguage}"]
-            }
-            Categorization metrics:
-            - Vacations, flight rules, logistics, city visits -> "trip"
-            - Business workflows, coding tasks, SaaS, complex automation blueprints -> "project"
-            - Loose high-level thoughts, creative concepts, logic formulas -> "idea"`;
+            const systemContext = `You are an expert strategic advisor and a practical learning mentor.
+Analyze the user input and build a highly detailed, step-by-step actionable roadmap.
+
+For each step inside the "roadmap" array, you MUST provide a rich text containing:
+1. Practical Action: EXACTLY what the user needs to do in a concrete way.
+2. Learning Resources: Give specific names of platforms, websites, or documentation where they can learn this masterfully (e.g., Make Academy, YouTube tutorials, specific developer docs, Coursera, etc.).
+
+You must reply ONLY with a clean JSON object. No Markdown code fences or extra text.
+The JSON structure must match this scheme perfectly:
+{
+  "category": "idea" or "project" or "trip",
+  "title": "A short elegant title strictly written in ${targetLanguage}",
+  "roadmap": [
+    "Step 1: [Actionable details on what to do] | Where to learn: [Specific platforms or search terms] - strictly written in ${targetLanguage}",
+    "Step 2: [Actionable details on what to do] | Where to learn: [Specific platforms or search terms] - strictly written in ${targetLanguage}"
+  ]
+}`;
+           
 
            try {
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
