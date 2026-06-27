@@ -1,117 +1,269 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmartFlow AI - Dashboard</title>
-    <!-- Tailwind CSS for modern responsive UI -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; padding-bottom: 80px; }
+        @media (min-width: 768px) { body { padding-bottom: 20px; } }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen antialiased pb-12">
+<body class="bg-slate-950 text-slate-100 min-h-screen antialiased">
 
-    <!-- Top Navigation Bar -->
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-4 py-4 md:px-8">
+    <!-- Top Header -->
+    <header class="border-b border-slate-800/80 bg-slate-900/50 backdrop-blur sticky top-0 z-40 px-4 py-4 md:px-8">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-lg shadow-indigo-600/30">
-                    <i class="fa-solid fa-brain text-xl"></i>
-                </div>
-                <div>
-                    <h1 class="text-xl md:text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">SmartFlow AI</h1>
-                    <p class="text-xs text-slate-400">Intelligent Automation & Roadmap Hub</p>
-                </div>
-            </div>
-            <!-- API Configuration Dropdown -->
-            <div class="w-full sm:w-auto">
-                <div class="bg-slate-800 p-2 rounded-xl border border-slate-700 flex items-center gap-2">
-                    <i class="fa-solid fa-key text-slate-400 pl-2"></i>
-                    <input type="password" id="apiKeyInput" placeholder="Enter Gemini API Key..." class="bg-transparent text-sm text-slate-200 outline-none w-full sm:w-48 placeholder-slate-500">
-                    <button onclick="saveApiKey()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg font-medium transition-all">Save</button>
+            
+            <!-- Brand & Logo Space -->
+            <div class="text-center sm:text-left flex flex-col sm:flex-row items-center gap-3">
+                <div class="flex flex-col items-center sm:items-start">
+                    <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent" id="ui-brand-title">SmartFlow AI</h1>
+                    <!-- App Logo Placeholder (Under Title) -->
+                    <div class="my-2">
+                        <img id="appLogo" src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" alt="App Icon" class="w-12 h-12 md:w-14 md:h-14 object-cover rounded-2xl border-2 border-indigo-500/30 p-1 bg-slate-900 shadow-md">
+                    </div>
+                    <p class="text-xs text-slate-400 font-medium" id="ui-brand-desc">Intelligent Automation Hub</p>
                 </div>
             </div>
+
+            <!-- Language & API Config Controls -->
+            <div class="flex flex-wrap items-center justify-center gap-3 w-full sm:w-auto">
+                <!-- Language Selector Toggle -->
+                <div class="bg-slate-900 p-1 rounded-xl border border-slate-800 flex gap-1">
+                    <button onclick="changeLang('fr')" id="lang-fr" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white">FR</button>
+                    <button onclick="changeLang('en')" id="lang-en" class="px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-slate-200">EN</button>
+                </div>
+                
+                <!-- API input -->
+                <div class="bg-slate-900 p-1.5 rounded-xl border border-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-key text-slate-500 text-xs pl-2"></i>
+                    <input type="password" id="apiKeyInput" placeholder="Gemini API Key..." class="bg-transparent text-xs text-slate-200 outline-none w-32 md:w-44 placeholder-slate-600">
+                    <button onclick="saveApiKey()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-[11px] px-2.5 py-1 rounded-lg font-medium transition-all" id="ui-save-btn">Save</button>
+                </div>
+            </div>
+
         </div>
     </header>
 
     <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 pt-8 md:px-8">
+    <main class="max-w-7xl mx-auto px-4 pt-6 md:px-8">
         
-        <!-- Search & AI Generation Bar -->
-        <section class="mb-10 bg-gradient-to-b from-slate-800 to-slate-900/50 p-5 md:p-8 rounded-2xl border border-slate-800 shadow-xl">
-            <div class="max-w-3xl mx-auto text-center mb-6">
-                <h2 class="text-lg md:text-2xl font-semibold mb-2">💡 اطلب أي خطة، فكرة، أو سفرية من الذكاء الاصطناعي</h2>
-                <p class="text-xs md:text-sm text-slate-400">اكتب فكرتك بالدريجة، العربية، أو الإنجليزية وسيقوم النظام بتحليلها وتصنيفها آلياً</p>
+        <!-- DYNAMIC STATS BAR -->
+        <section class="grid grid-cols-4 gap-3 mb-8 bg-slate-900/30 p-3 rounded-2xl border border-slate-900 shadow-inner">
+            <div class="bg-slate-900/80 border border-slate-800/60 p-3 rounded-xl text-center">
+                <p class="text-[10px] uppercase tracking-wider text-slate-500 font-bold" id="stat-total">Total</p>
+                <p class="text-lg md:text-2xl font-bold text-indigo-400 mt-1" id="count-total">0</p>
             </div>
-            <div class="max-w-3xl mx-auto flex flex-col sm:flex-row gap-3">
-                <input type="text" id="aiPrompt" placeholder="مثال: بغيت ندير مشروع سيت ديال تجارة إلكترونية... أو... خطة سفر لمراكش 3 أيام..." class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3.5 text-slate-200 text-sm md:text-base outline-none focus:border-indigo-500 transition-colors placeholder-slate-600">
-                <button onclick="generateRoadmap()" id="genBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium px-6 py-3.5 rounded-xl text-sm md:text-base transition-all flex items-center justify-center gap-2 whitespace-nowrap shadow-lg shadow-indigo-600/20">
+            <div class="bg-slate-900/80 border border-slate-800/60 p-3 rounded-xl text-center">
+                <p class="text-[10px] uppercase tracking-wider text-amber-500/80 font-bold" id="stat-ideas">Ideas</p>
+                <p class="text-lg md:text-2xl font-bold text-amber-400 mt-1" id="count-ideas">0</p>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800/60 p-3 rounded-xl text-center">
+                <p class="text-[10px] uppercase tracking-wider text-emerald-500/80 font-bold" id="stat-projects">Projects</p>
+                <p class="text-lg md:text-2xl font-bold text-emerald-400 mt-1" id="count-projects">0</p>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800/60 p-3 rounded-xl text-center">
+                <p class="text-[10px] uppercase tracking-wider text-sky-500/80 font-bold" id="stat-trips">Trips</p>
+                <p class="text-lg md:text-2xl font-bold text-sky-400 mt-1" id="count-trips">0</p>
+            </div>
+        </section>
+        
+        <!-- SEARCH / AI PROMPT SECTION -->
+        <section id="section-search" class="mb-8 bg-gradient-to-b from-slate-900 to-slate-950 p-4 md:p-6 rounded-2xl border border-slate-800/80 shadow-xl main-section">
+            <div class="text-center mb-4">
+                <h2 class="text-base md:text-xl font-bold text-slate-100" id="ui-search-title">Générateur de Roadmaps IA</h2>
+                <p class="text-xs text-slate-400 mt-1" id="ui-search-desc">Entrez une idée ou un plan, l'IA va structurer et catégoriser le tout automatiquement.</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 max-w-3xl mx-auto">
+                <input type="text" id="aiPrompt" placeholder="Ex: Créer un SaaS de scraping... Planifier un voyage à Paris 5 jours..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm outline-none focus:border-indigo-500 text-slate-200 placeholder-slate-700 transition-colors">
+                <button onclick="generateRoadmap()" id="genBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-3 rounded-xl text-xs md:text-sm transition-all flex items-center justify-center gap-2 whitespace-nowrap">
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>Générer Roadmap</span>
+                    <span id="ui-btn-text">Générer</span>
                 </button>
             </div>
-            <!-- Loading Indicator -->
-            <div id="loading" class="hidden text-center mt-4 text-indigo-400 text-sm animate-pulse">
-                <i class="fa-solid fa-spinner animate-spin mr-2"></i> جاري التفكير وبناء الخطة وتصنيفها...
+            <div id="loading" class="hidden text-center mt-3 text-indigo-400 text-xs font-medium animate-pulse">
+                <i class="fa-solid fa-spinner animate-spin mr-1"></i> <span id="ui-loading-text">Analyse et structuration en cours...</span>
             </div>
         </section>
 
-        <!-- Dashboard Columns Grid (Perfectly Responsive: 1 col mobile, 3 cols desktop) -->
+        <!-- DASHBOARD GRID COLS -->
         <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <!-- COLUMN 1: IDEAS -->
-            <div class="bg-slate-900/50 rounded-2xl border border-slate-800/80 p-4 md:p-5">
-                <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-800">
-                    <div class="bg-amber-500/10 text-amber-400 p-2 rounded-lg text-sm"><i class="fa-solid fa-lightbulb"></i></div>
-                    <h3 class="font-bold text-base md:text-lg text-slate-200">Ideas / الأفكار</h3>
+            <!-- COL 1: IDEAS -->
+            <div id="col-ideas" class="bg-slate-900/20 rounded-2xl border border-slate-900 p-4 main-section">
+                <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-900">
+                    <div class="bg-amber-500/10 text-amber-400 p-2 rounded-lg text-xs"><i class="fa-solid fa-lightbulb"></i></div>
+                    <h3 class="font-bold text-sm md:text-base text-slate-200" id="ui-title-ideas">Idées / Brainstorm</h3>
                 </div>
-                <div id="ideasContainer" class="space-y-4"></div>
+                <div id="ideasContainer" class="space-y-3"></div>
             </div>
 
-            <!-- COLUMN 2: PROJECTS -->
-            <div class="bg-slate-900/50 rounded-2xl border border-slate-800/80 p-4 md:p-5">
-                <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-800">
-                    <div class="bg-emerald-500/10 text-emerald-400 p-2 rounded-lg text-sm"><i class="fa-solid fa-rocket"></i></div>
-                    <h3 class="font-bold text-base md:text-lg text-slate-200">Projects / المشاريع</h3>
+            <!-- COL 2: PROJECTS -->
+            <div id="col-projects" class="bg-slate-900/20 rounded-2xl border border-slate-900 p-4 main-section">
+                <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-900">
+                    <div class="bg-emerald-500/10 text-emerald-400 p-2 rounded-lg text-xs"><i class="fa-solid fa-rocket"></i></div>
+                    <h3 class="font-bold text-sm md:text-base text-slate-200" id="ui-title-projects">Projets / Blueprints</h3>
                 </div>
-                <div id="projectsContainer" class="space-y-4"></div>
+                <div id="projectsContainer" class="space-y-3"></div>
             </div>
 
-            <!-- COLUMN 3: TRIPS -->
-            <div class="bg-slate-900/50 rounded-2xl border border-slate-800/80 p-4 md:p-5">
-                <div class="flex items-center gap-2.5 mb-4 pb-3 border-b border-slate-800">
-                    <div class="bg-sky-500/10 text-sky-400 p-2 rounded-lg text-sm"><i class="fa-solid fa-plane"></i></div>
-                    <h3 class="font-bold text-base md:text-lg text-slate-200">Trips & Travel / الرحلات</h3>
+            <!-- COL 3: TRIPS -->
+            <div id="col-trips" class="bg-slate-900/20 rounded-2xl border border-slate-900 p-4 main-section">
+                <div class="flex items-center gap-2 mb-4 pb-2 border-b border-slate-900">
+                    <div class="bg-sky-500/10 text-sky-400 p-2 rounded-lg text-xs"><i class="fa-solid fa-plane"></i></div>
+                    <h3 class="font-bold text-sm md:text-base text-slate-200" id="ui-title-trips">Voyages / Trips</h3>
                 </div>
-                <div id="tripsContainer" class="space-y-4"></div>
+                <div id="tripsContainer" class="space-y-3"></div>
             </div>
 
         </section>
     </main>
 
-    <!-- Core App Logic Javascript -->
+    <!-- NATIVE-LIKE MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/80 flex justify-around items-center py-2.5 z-50 px-2 shadow-2xl">
+        <button onclick="switchMobileTab('search')" id="nav-search" class="flex flex-col items-center gap-1 text-indigo-400 text-xs font-medium transition-all">
+            <i class="fa-solid fa-magnifying-glass text-lg"></i>
+            <span class="text-[10px]">IA Box</span>
+        </button>
+        <button onclick="switchMobileTab('ideas')" id="nav-ideas" class="flex flex-col items-center gap-1 text-slate-500 text-xs font-medium transition-all">
+            <i class="fa-solid fa-lightbulb text-lg"></i>
+            <span class="text-[10px]">Ideas</span>
+        </button>
+        <button onclick="switchMobileTab('projects')" id="nav-projects" class="flex flex-col items-center gap-1 text-slate-500 text-xs font-medium transition-all">
+            <i class="fa-solid fa-rocket text-lg"></i>
+            <span class="text-[10px]">Projects</span>
+        </button>
+        <button onclick="switchMobileTab('trips')" id="nav-trips" class="flex flex-col items-center gap-1 text-slate-500 text-xs font-medium transition-all">
+            <i class="fa-solid fa-plane text-lg"></i>
+            <span class="text-[10px]">Trips</span>
+        </button>
+    </nav>
+
+    <!-- Core App Logic Script -->
     <script>
-        // Load initial setup from local storage
+        let currentLang = localStorage.getItem('smartflow_lang') || 'fr';
+
+        const translations = {
+            fr: {
+                brandDesc: "Hub d'Automatisation Intelligent",
+                saveBtn: "Sauver",
+                searchTitle: "Générateur de Roadmaps Intellectuelles",
+                searchDesc: "Entrez une idée ou un plan, l'IA va structurer et catégoriser le tout automatiquement.",
+                placeholder: "Ex: Créer un SaaS de scraping... Planifier un voyage à Paris 5 jours...",
+                btnText: "Générer",
+                loadingText: "Analyse et structuration en cours...",
+                titleIdeas: "Idées / Brainstorm",
+                titleProjects: "Projets / Blueprints",
+                titleTrips: "Voyages / Voyages",
+                empty: "Vide",
+                statTotal: "Total",
+                statIdeas: "Idées",
+                statProjects: "Projets",
+                statTrips: "Voyages"
+            },
+            en: {
+                brandDesc: "Intelligent Automation Hub",
+                saveBtn: "Save",
+                searchTitle: "AI Roadmap Generator",
+                searchDesc: "Enter any idea or vision, the AI will structure and categorize it instantly.",
+                placeholder: "Ex: Build a web scraping SaaS... Plan a 5-day trip to London...",
+                btnText: "Generate",
+                loadingText: "Thinking and organizing content...",
+                titleIdeas: "Ideas / Brainstorm",
+                titleProjects: "Projects / Blueprints",
+                titleTrips: "Trips & Travel",
+                empty: "Empty",
+                statTotal: "Total",
+                statIdeas: "Ideas",
+                statProjects: "Projects",
+                statTrips: "Trips"
+            }
+        };
+
         document.addEventListener('DOMContentLoaded', () => {
             const savedKey = localStorage.getItem('gemini_api_key');
             if (savedKey) document.getElementById('apiKeyInput').value = savedKey;
-            renderItems();
+            
+            changeLang(currentLang);
+            // Handle responsive view display setup
+            if (window.innerWidth < 768) {
+                switchMobileTab('search');
+            }
         });
+
+        function changeLang(lang) {
+            currentLang = lang;
+            localStorage.setItem('smartflow_lang', lang);
+
+            // Toggle UI button colors
+            document.getElementById('lang-fr').className = lang === 'fr' ? 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-slate-200';
+            document.getElementById('lang-en').className = lang === 'en' ? 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-indigo-600 text-white' : 'px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-slate-200';
+
+            // Update UI elements texts safely
+            const t = translations[lang];
+            document.getElementById('ui-brand-desc').innerText = t.brandDesc;
+            document.getElementById('ui-save-btn').innerText = t.saveBtn;
+            document.getElementById('ui-search-title').innerText = t.searchTitle;
+            document.getElementById('ui-search-desc').innerText = t.searchDesc;
+            document.getElementById('aiPrompt').placeholder = t.placeholder;
+            document.getElementById('ui-btn-text').innerText = t.btnText;
+            document.getElementById('ui-loading-text').innerText = t.loadingText;
+            document.getElementById('ui-title-ideas').innerText = t.titleIdeas;
+            document.getElementById('ui-title-projects').innerText = t.titleProjects;
+            document.getElementById('ui-title-trips').innerText = t.titleTrips;
+            
+            document.getElementById('stat-total').innerText = t.statTotal;
+            document.getElementById('stat-ideas').innerText = t.statIdeas;
+            document.getElementById('stat-projects').innerText = t.statProjects;
+            document.getElementById('stat-trips').innerText = t.statTrips;
+
+            renderItems();
+        }
+
+        function switchMobileTab(tab) {
+            if (window.innerWidth >= 768) return; // Only trigger navigation behavior on mobile layouts
+
+            // Hide all sections first on mobile view
+            document.querySelectorAll('.main-section').forEach(el => el.classList.add('hidden'));
+            
+            // Reset nav colors
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('text-indigo-400');
+                btn.classList.add('text-slate-500');
+            });
+
+            // Show current active column/tab view
+            if (tab === 'search') {
+                document.getElementById('section-search').classList.remove('hidden');
+                document.getElementById('nav-search').classList.add('text-indigo-400');
+            } else if (tab === 'ideas') {
+                document.getElementById('col-ideas').classList.remove('hidden');
+                document.getElementById('nav-ideas').classList.add('text-indigo-400');
+            } else if (tab === 'projects') {
+                document.getElementById('col-projects').classList.remove('hidden');
+                document.getElementById('nav-projects').classList.add('text-indigo-400');
+            } else if (tab === 'trips') {
+                document.getElementById('col-trips').classList.remove('hidden');
+                document.getElementById('nav-trips').classList.add('text-indigo-400');
+            }
+        }
 
         function saveApiKey() {
             const key = document.getElementById('apiKeyInput').value.trim();
             localStorage.setItem('gemini_api_key', key);
-            alert('🚀 Key saved configuration successfully!');
+            alert('Config Saved!');
         }
 
         async function generateRoadmap() {
             const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
-                alert('⚠️ Please insert your Gemini API Key in the top configuration bar first!');
+                alert(currentLang === 'fr' ? 'Veuillez configurer votre API Key d\'abord!' : 'Please set your API Key first!');
                 return;
             }
 
@@ -124,58 +276,60 @@
             btn.disabled = true;
             loading.classList.remove('hidden');
 
-            // Structured System Instructions forcing JSON Response from Gemini 2.0 Flash
-            const systemContext = `You are an AI Automation Specialist and Strategic Planner. 
-            Analyze the user prompt and generate a highly professional roadmap.
-            You must return a raw JSON object ONLY. Do not wrap it in markdown block quotes or fences.
-            The JSON structure must strictly be:
+            const targetLanguage = currentLang === 'fr' ? 'French (Français)' : 'English';
+
+            const systemContext = `You are a high-level strategic advisor. 
+            Analyze the user input and build a structured response.
+            You must reply ONLY with a clean JSON object. No Markdown code fences or extra text.
+            The JSON structure must match this scheme perfectly:
             {
                 "category": "idea" or "project" or "trip",
-                "title": "A highly professional and clean title in Arabic/French based on prompt context",
-                "roadmap": ["Step 1 description", "Step 2 description", "Step 3 description", "Step 4 description"]
+                "title": "A short elegant title strictly written in ${targetLanguage}",
+                "roadmap": ["Step 1 formatted in ${targetLanguage}", "Step 2 formatted in ${targetLanguage}", "Step 3 formatted in ${targetLanguage}", "Step 4 formatted in ${targetLanguage}"]
             }
-            Rules for category routing:
-            - If it's about travel, vacations, exploring cities, flights, choose "trip".
-            - If it's a solid business blueprint, application development, SaaS, automation setup, choose "project".
-            - If it's an abstract concept, thoughts, creative logic, brainstorming, choose "idea".`;
+            Categorization metrics:
+            - Vacations, flight rules, logistics, city visits -> "trip"
+            - Business workflows, coding tasks, SaaS, complex automation blueprints -> "project"
+            - Loose high-level thoughts, creative concepts, logic formulas -> "idea"`;
 
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: `${systemContext}\n\nUser Request: ${promptInput}` }] }],
+                        contents: [{ parts: [{ text: `${systemContext}\n\nUser Prompt: ${promptInput}` }] }],
                         generationConfig: { responseMimeType: "application/json" }
                     })
                 });
 
                 const data = await response.json();
-                if (data.error) {
-                    throw new Error(data.error.message);
-                }
+                if (data.error) throw new Error(data.error.message);
 
                 const jsonText = data.candidates[0].content.parts[0].text;
                 const result = JSON.parse(jsonText);
 
-                // Add date and ID timestamp
                 const newItem = {
                     id: Date.now(),
-                    date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' }),
+                    date: new Date().toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit' }),
                     title: result.title,
                     category: result.category,
                     roadmap: result.roadmap
                 };
 
-                // Save to localstorage storage flow
                 let currentItems = JSON.parse(localStorage.getItem('smartflow_items')) || [];
                 currentItems.unshift(newItem);
                 localStorage.setItem('smartflow_items', JSON.stringify(currentItems));
 
                 document.getElementById('aiPrompt').value = '';
                 renderItems();
+                
+                // On mobile, switch views to the generated asset column automatically to show success
+                if(window.innerWidth < 768) {
+                    switchMobileTab(result.category === 'idea' ? 'ideas' : result.category === 'project' ? 'projects' : 'trips');
+                }
 
             } catch (err) {
-                alert('Error: ' + err.message);
+                alert('API Error: ' + err.message);
                 console.error(err);
             } finally {
                 btn.disabled = false;
@@ -192,53 +346,57 @@
                 trip: document.getElementById('tripsContainer')
             };
 
-            // Clear all columns first
+            // Dynamic Counter Updates
+            let counts = { total: items.length, idea: 0, project: 0, trip: 0 };
+
+            // Empty structures
             Object.values(containers).forEach(c => c.innerHTML = '');
 
-            if(items.length === 0) {
-                Object.values(containers).forEach(c => {
-                    c.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No item yet / فارغ</p>`;
-                });
-                return;
-            }
-
             items.forEach(item => {
+                if(counts[item.category] !== undefined) counts[item.category]++;
+
                 let roadmapHtml = '';
                 item.roadmap.forEach((step, idx) => {
                     roadmapHtml += `
-                        <div class="flex gap-2 text-xs md:text-sm text-slate-300">
-                            <span class="text-indigo-400 font-bold">${idx + 1}.</span>
-                            <p>${step}</p>
+                        <div class="flex gap-2.5 text-xs md:text-sm text-slate-300 leading-relaxed">
+                            <span class="text-indigo-400 font-bold text-xs">${idx + 1}.</span>
+                            <p class="flex-1">${step}</p>
                         </div>`;
                 });
 
-                const itemCard = `
-                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 hover:border-slate-700 transition-all shadow-md relative group">
-                        <div class="flex justify-between items-start gap-2 mb-2">
-                            <h4 class="text-sm md:text-base font-semibold text-white tracking-wide">${item.title}</h4>
-                            <button onclick="deleteItem(${item.id})" class="text-slate-500 hover:text-rose-400 text-xs transition-colors p-1">
+                const card = `
+                    <div class="bg-slate-900/90 border border-slate-800/80 p-4 rounded-xl hover:border-slate-700 transition-all shadow-lg">
+                        <div class="flex justify-between items-start gap-2 mb-1.5">
+                            <h4 class="text-xs md:text-sm font-semibold text-white tracking-wide">${item.title}</h4>
+                            <button onclick="deleteItem(${item.id})" class="text-slate-600 hover:text-rose-400 text-xs p-1 transition-colors">
                                 <i class="fa-solid fa-trash-can"></i>
                             </button>
                         </div>
-                        <span class="inline-block text-[10px] font-medium bg-slate-800 text-slate-400 px-2 py-0.5 rounded mb-3">
-                            <i class="fa-regular fa-calendar-days mr-1 text-[9px]"></i> ${item.date}
+                        <span class="inline-block text-[9px] font-medium bg-slate-950 text-slate-500 px-2 py-0.5 rounded-md mb-3">
+                            <i class="fa-regular fa-calendar-days mr-1"></i> ${item.date}
                         </span>
-                        <div class="space-y-2 border-t border-slate-900 pt-3">
+                        <div class="space-y-2 border-t border-slate-800/50 pt-2.5">
                             ${roadmapHtml}
                         </div>
                     </div>`;
 
                 if (containers[item.category]) {
-                    containers[item.category].innerHTML += itemCard;
+                    containers[item.category].innerHTML += card;
                 }
             });
 
-            // Put placeholder if any container remains empty after loop
+            // Put localized placeholder info
             Object.keys(containers).forEach(key => {
                 if(containers[key].innerHTML === '') {
-                    containers[key].innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No item yet / فارغ</p>`;
+                    containers[key].innerHTML = `<p class="text-[11px] text-slate-600 text-center py-6">${translations[currentLang].empty}</p>`;
                 }
             });
+
+            // Push numbers to UI dashboard counters view
+            document.getElementById('count-total').innerText = counts.total;
+            document.getElementById('count-ideas').innerText = counts.idea;
+            document.getElementById('count-projects').innerText = counts.project;
+            document.getElementById('count-trips').innerText = counts.trip;
         }
 
         function deleteItem(id) {
